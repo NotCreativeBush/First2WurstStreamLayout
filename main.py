@@ -8,30 +8,17 @@ import streamlink
 import vlc
 
 
-def startStream1():
-    streams = streamlink.streams(ControlWindow.streamEntry1.get())
+def startStream(streamEntry, vlcInstance):
+    streams = streamlink.streams(streamEntry.get())
 
     print(streams["best"].url)
 
-    Media = LayoutWindow.vlcInstance1.media_new(streams["best"].url)
+    Media = vlcInstance.media_new(streams["best"].url)
     # LayoutWindow.vlcPlayer1.set_hwnd(LayoutWindow.runnerFrame1.winfo_id())  # tkinter label or frame
-    LayoutWindow.vlcPlayer1.set_media(Media)
-    LayoutWindow.vlcPlayer1.audio_set_volume(30)
+    vlcInstance.set_media(Media)
+    vlcInstance.audio_set_volume(30)
 
-    LayoutWindow.vlcPlayer1.play()
-
-
-def startStream2():
-    streams = streamlink.streams(ControlWindow.streamEntry2.get())
-
-    print(streams["best"].url)
-
-    Media = LayoutWindow.vlcInstance2.media_new(streams["best"].url)
-    # LayoutWindow.vlcPlayer2.set_hwnd(LayoutWindow.runnerFrame2.winfo_id())  # tkinter label or frame
-    LayoutWindow.vlcPlayer2.set_media(Media)
-    LayoutWindow.vlcPlayer2.audio_set_volume(30)
-
-    LayoutWindow.vlcPlayer2.play()
+    vlcInstance.play()
 
 
 def smooth_resize_and_move(frame, target_width, target_height, target_x, target_y, step=10):
@@ -104,90 +91,25 @@ def equalRunnerFocus():
 #     LayoutWindow.runnerFrame1.config(width=int(960 / 1.3), height=int(540 / 1.3))
 
 
-def setProgressRunner1(progressLabels, holdOrTake, i):
+def setProgressRunner(progressLabels, holdOrTake, i):
     for x in range(i):
         progressLabels[x].config(fg="green")
     for x in range(i + 1, 5):
-        LayoutWindow.progressLabels1[x].config(fg="black")
+        progressLabels[x].config(fg="black")
     if holdOrTake == 0:
-        LayoutWindow.progressLabels1[i].config(fg="blue")
+        progressLabels[i].config(fg="blue")
     else:
-        LayoutWindow.progressLabels1[i].config(fg="orange")
+        progressLabels[i].config(fg="orange")
 
-
-def setProgressRunner2(holdOrTake, i):
-    for x in range(i):
-        LayoutWindow.progressLabels2[x].config(fg="green")
-    for x in range(i + 1, 5):
-        LayoutWindow.progressLabels2[x].config(fg="black")
-    if holdOrTake == 0:
-        LayoutWindow.progressLabels2[i].config(fg="blue")
-    else:
-        LayoutWindow.progressLabels2[i].config(fg="orange")
-
-
-class ControlWindow:
-    root = tk.Tk()
-    root.title("Control Window")
-    root.geometry("1000x500")
-    frame = Frame(root)
-    frame.pack(fill="both", expand="yes")
-
-    streamlinks = LabelFrame(frame, text="Stream Links")
-
-    streamEntry1 = Entry(streamlinks)
-    streamEntry1.pack()
-
-    streamEntry1Start = Button(streamlinks, command=startStream1, text="Start Runner 1 Stream")
-    streamEntry1Start.pack()
-
-    streamEntry2 = Entry(streamlinks)
-    streamEntry2.pack()
-
-    streamEntry2Start = Button(streamlinks, command=startStream2, text="Start Runner 2 Stream")
-    streamEntry2Start.pack()
-
-    streamlinks.pack(side=tk.RIGHT)
-
-    runnerFocus = LabelFrame(frame, text="Focus runners")
-    noRunnerFocus = Button(runnerFocus, text="Keep focus equal", command=equalRunnerFocus)
-    noRunnerFocus.pack()
-    runner1FocusButton = Button(runnerFocus, text="Focus on Runner 1", command=runner1Focus)
-    runner1FocusButton.pack()
-    runner2FocusButton = Button(runnerFocus, text="Focus on Runner 2", command=runner2Focus)
-    runner2FocusButton.pack()
-    runnerFocus.pack()
-
-    progressRunner1 = LabelFrame(frame, text="Progress control Runner 1")
-    progressButtons1 = []
-    for i in range(5):
-        progressButtons1 += [
-            Button(progressRunner1, text="take " + str(i + 1), command=partial(setProgressRunner1, progressRunner1, 0, i))]
-        progressButtons1[-1].pack(side=tk.LEFT)
-        progressButtons1 += [
-            Button(progressRunner1, text="hold " + str(i + 1), command=partial(setProgressRunner1, 1, i))]
-        progressButtons1[-1].pack(side=tk.LEFT)
-    progressRunner1.pack(side=tk.TOP)
-
-    progressRunner2 = LabelFrame(frame, text="Progress control Runner 2")
-    progressButtons2 = []
-    for i in range(5):
-        progressButtons2 += [
-            Button(progressRunner2, text="take " + str(i + 1), command=partial(setProgressRunner2, 0, i))]
-        progressButtons2[-1].pack(side=tk.LEFT)
-        progressButtons2 += [
-            Button(progressRunner2, text="hold " + str(i + 1), command=partial(setProgressRunner2, 1, i))]
-        progressButtons2[-1].pack(side=tk.LEFT)
-    progressRunner2.pack(side=tk.TOP)
 
 
 class LayoutWindow:
-    toplevel = Toplevel(ControlWindow.root, bg="black")
-    toplevel.geometry("1920x1080")
-    toplevel.title("Stream Layout Window")
-    runnerFrame1 = Frame(toplevel, width=960, height=540)
+    root =tk.Tk()
+    root.geometry("1920x1080")
+    root.title("Stream Layout Window")
+    runnerFrame1 = Frame(root, width=960, height=540)
     runnerFrame1.place(x=0, y=200)
-    runnerFrame2 = Frame(toplevel, width=960, height=540)
+    runnerFrame2 = Frame(root, width=960, height=540)
     runnerFrame2.place(x=960, y=200)
 
     vlcInstance1 = vlc.Instance()
@@ -198,7 +120,7 @@ class LayoutWindow:
     vlcPlayer1.set_hwnd(runnerFrame1.winfo_id())
     vlcPlayer2.set_hwnd(runnerFrame2.winfo_id())
 
-    progressBarRunner1 = Frame(toplevel, width=960, height=100, bg="grey")
+    progressBarRunner1 = Frame(root, width=960, height=100, bg="grey")
 
     runnerNameLabel1 = Label(progressBarRunner1, text="bdsab", font=("Roboto", 30), background="blue")
     runnerNameLabel1.place(x=0, y=0)
@@ -208,7 +130,7 @@ class LayoutWindow:
             Label(progressBarRunner1, text="hold " + str(i + 1), font=("Roboto", 30), background="grey")]
         progressLabels1[-1].place(x=30 + i * 150, y=50)
 
-    progressBarRunner2 = Frame(toplevel, width=960, height=100, bg="grey")
+    progressBarRunner2 = Frame(root, width=960, height=100, bg="grey")
     runnerNameLabel2 = Label(progressBarRunner2, text="bdsab", font=("Roboto", 30), background="blue",width=30)
     runnerNameLabel2.place(x=0, y=0)
 
@@ -228,8 +150,61 @@ class LayoutWindow:
 
     # player.play()
 
+class ControlWindow:
+    toplevel = Toplevel(LayoutWindow.root)
+    toplevel.title("Control Window")
+    toplevel.geometry("1000x500")
+    frame = Frame(toplevel)
+    frame.pack(fill="both", expand="yes")
 
-ControlWindow.root.mainloop()
+    streamlinks = LabelFrame(frame, text="Stream Links")
+
+    streamEntry1 = Entry(streamlinks)
+    streamEntry1.pack()
+
+    streamEntry1Start = Button(streamlinks, command=partial(startStream, streamEntry1, LayoutWindow.vlcInstance1), text="Start Runner 1 Stream")
+    streamEntry1Start.pack()
+
+    streamEntry2 = Entry(streamlinks)
+    streamEntry2.pack()
+
+    streamEntry2Start = Button(streamlinks, command=partial(startStream, streamEntry2, LayoutWindow.vlcInstance2), text="Start Runner 2 Stream")
+    streamEntry2Start.pack()
+
+    streamlinks.pack(side=tk.RIGHT)
+
+    runnerFocus = LabelFrame(frame, text="Focus runners")
+    noRunnerFocus = Button(runnerFocus, text="Keep focus equal", command=equalRunnerFocus)
+    noRunnerFocus.pack()
+    runner1FocusButton = Button(runnerFocus, text="Focus on Runner 1", command=runner1Focus)
+    runner1FocusButton.pack()
+    runner2FocusButton = Button(runnerFocus, text="Focus on Runner 2", command=runner2Focus)
+    runner2FocusButton.pack()
+    runnerFocus.pack()
+
+    progressRunner1 = LabelFrame(frame, text="Progress control Runner 1")
+    progressButtons1 = []
+    for i in range(5):
+        progressButtons1 += [
+            Button(progressRunner1, text="take " + str(i + 1), command=partial(setProgressRunner, LayoutWindow.progressLabels1, 0, i))]
+        progressButtons1[-1].pack(side=tk.LEFT)
+        progressButtons1 += [
+            Button(progressRunner1, text="hold " + str(i + 1), command=partial(setProgressRunner, LayoutWindow.progressLabels1, 1, i))]
+        progressButtons1[-1].pack(side=tk.LEFT)
+    progressRunner1.pack(side=tk.TOP)
+
+    progressRunner2 = LabelFrame(frame, text="Progress control Runner 2")
+    progressButtons2 = []
+    for i in range(5):
+        progressButtons2 += [
+            Button(progressRunner2, text="take " + str(i + 1), command=partial(setProgressRunner, LayoutWindow.progressLabels2, 0, i))]
+        progressButtons2[-1].pack(side=tk.LEFT)
+        progressButtons2 += [
+            Button(progressRunner2, text="hold " + str(i + 1), command=partial(setProgressRunner, LayoutWindow.progressLabels2, 1, i))]
+        progressButtons2[-1].pack(side=tk.LEFT)
+    progressRunner2.pack(side=tk.TOP)
+
+LayoutWindow.root.mainloop()
 
 """
 
