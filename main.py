@@ -8,17 +8,17 @@ import streamlink
 import vlc
 
 
-def startStream(streamEntry, vlcInstance):
+def startStream(streamEntry, vlcPlayer, vlcInstance):
     streams = streamlink.streams(streamEntry.get())
 
     print(streams["best"].url)
 
     Media = vlcInstance.media_new(streams["best"].url)
     # LayoutWindow.vlcPlayer1.set_hwnd(LayoutWindow.runnerFrame1.winfo_id())  # tkinter label or frame
-    vlcInstance.set_media(Media)
-    vlcInstance.audio_set_volume(30)
+    vlcPlayer.set_media(Media)
+    vlcPlayer.audio_set_volume(30)
 
-    vlcInstance.play()
+    vlcPlayer.play()
 
 
 def smooth_resize_and_move(frame, target_width, target_height, target_x, target_y, step=10):
@@ -162,13 +162,13 @@ class ControlWindow:
     streamEntry1 = Entry(streamlinks)
     streamEntry1.pack()
 
-    streamEntry1Start = Button(streamlinks, command=partial(startStream, streamEntry1, LayoutWindow.vlcInstance1), text="Start Runner 1 Stream")
+    streamEntry1Start = Button(streamlinks, command=partial(startStream, streamEntry1, LayoutWindow.vlcPlayer1, LayoutWindow.vlcInstance1), text="Start Runner 1 Stream")
     streamEntry1Start.pack()
 
     streamEntry2 = Entry(streamlinks)
     streamEntry2.pack()
 
-    streamEntry2Start = Button(streamlinks, command=partial(startStream, streamEntry2, LayoutWindow.vlcInstance2), text="Start Runner 2 Stream")
+    streamEntry2Start = Button(streamlinks, command=partial(startStream, streamEntry2, LayoutWindow.vlcPlayer2, LayoutWindow.vlcInstance2), text="Start Runner 2 Stream")
     streamEntry2Start.pack()
 
     streamlinks.pack(side=tk.RIGHT)
